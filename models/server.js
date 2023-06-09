@@ -2,6 +2,7 @@
 const express = require('express');
 const cors = require('cors');
 const { dbConnection } = require('../database/config');
+const { socketController } = require('../sockets/controller');
 //end require
 
 class Server { //class server name
@@ -34,6 +35,9 @@ class Server { //class server name
         //agregamos las rutas
         this.routes();
 
+        // eventos de sockets
+        this.sockets();
+
     }
 
     async connectDB() {
@@ -49,6 +53,30 @@ class Server { //class server name
         //middleware para public
         this.app.use(express.static('public')); //el "use" es el elemento clave para la creacion de los middlewares
         // Note that this option available for versions 1.0.0 and newer. 
+    }
+
+    //creamos el nuevo metodo que manejara los eventos de sockets en el servidor
+    sockets(){
+        this.io.on("connection", socketController /*(socket) => { //con this hacemos referencia al objecto del servidor
+        // send a message to the client
+            //socket.emit("hello from server", 1, "2", { 3: Buffer.from([4]) });
+            console.log('Welcome to server socket', socket.id);
+            //para desconectar cliente en socket io
+            socket.on('disconnect', () => {
+                console.log('Disconnect from server', socket.id);
+            });
+
+            //siempre dentro de la conexion se crea el listener
+            //callback es la referencia al segundo argumento que se le envia, el nombre puede ser cualquiera
+            socket.on('send-message', (payload, callback) => { //on significa que esta escuchando a la espera de recibir, payload siempre es el primer argumento de la funcion, es decir, el payload es la informacion que recibimos del front
+                //para enviar a un cliente en especifico
+                const { id, time, msg } = payload;
+                //callback(id);// si solo queremos enviar un parametro
+                callback({id, msg, time}); //para enviar un objeto
+                //si yo quiero enviar mensaje a todos los clientes conectados en el momento
+                //this.io.emit('send-message', payload);
+            });
+        }*/);
     }
 
     routes() { // creamos esta funcion llamada rutas, aqui vamos a crear todas las rutas de nuetra app
